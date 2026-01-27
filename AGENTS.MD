@@ -44,6 +44,7 @@ Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 ## Docs
 
 - Start: run docs list (`docs:list` script, or `~/.codex/scripts/docs-list` here if present; ignore if not installed); open docs before coding.
+- Global `docs-list` on PATH (`~/.local/bin/docs-list` -> `~/.codex/bin/docs-list`); rebuild: `bun build ~/.codex/scripts/docs-list.ts --compile --outfile ~/.codex/bin/docs-list`.
 - Follow links until domain makes sense; honor `Read when` hints.
 - Keep notes short; update docs when behavior/API changes (no ship w/o docs).
 - Add `read_when` hints on cross-cutting docs.
@@ -76,7 +77,7 @@ Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 - Branch changes require user consent.
 - Destructive ops forbidden unless explicit (`reset --hard`, `clean`, `restore`, `rm`, …).
 - Remotes under `~/git`: prefer HTTPS; flip SSH->HTTPS before pull/push.
-- Commit helper on PATH: `committer` (bash). Prefer it; if repo has `./scripts/committer`, use that.
+- Commit helper on PATH: `~/.codex/scripts/committer` (bash). Prefer it; if repo has `./scripts/committer`, use that.
 - Don’t delete/rename unexpected stuff; stop + ask.
 - No repo-wide S/R scripts; keep edits small/reviewable.
 - Avoid manual `git stash`; if Git auto-stashes during pull/rebase, that’s fine (hint, not hard guardrail).
