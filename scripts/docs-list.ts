@@ -1,12 +1,75 @@
 #!/usr/bin/env tsx
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const docsListFile = fileURLToPath(import.meta.url);
 const docsListDir = dirname(docsListFile);
-const DOCS_DIR = join(docsListDir, '..', 'docs');
+
+function isDirectory(path: string): boolean {
+  if (!existsSync(path)) {
+    return false;
+  }
+  try {
+    return statSync(path).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function findRepoRoot(startDir: string): string | null {
+  let current = startDir;
+  while (true) {
+    if (existsSync(join(current, '.git'))) {
+      return current;
+    }
+    const parent = dirname(current);
+    if (parent === current) {
+      return null;
+    }
+    current = parent;
+  }
+}
+
+function findNearestDocsRoot(startDir: string): string | null {
+  let current = startDir;
+  while (true) {
+    if (isDirectory(join(current, 'docs'))) {
+      return current;
+    }
+    const parent = dirname(current);
+    if (parent === current) {
+      return null;
+    }
+    current = parent;
+  }
+}
+
+function resolveDocsDir(): string {
+  const cwd = process.cwd();
+  const candidates = [
+    findRepoRoot(cwd),
+    findNearestDocsRoot(cwd),
+    cwd,
+    join(docsListDir, '..'),
+  ].filter((value): value is string => Boolean(value));
+
+  for (const candidate of candidates) {
+    const docsDir = join(candidate, 'docs');
+    if (isDirectory(docsDir)) {
+      return docsDir;
+    }
+  }
+
+  throw new Error(
+    `Could not find a docs directory. Checked: ${candidates
+      .map((candidate) => join(candidate, 'docs'))
+      .join(', ')}`
+  );
+}
+
+const DOCS_DIR = resolveDocsDir();
 
 const EXCLUDED_DIRS = new Set(['archive', 'research']);
 
@@ -122,7 +185,7 @@ function extractMetadata(fullPath: string): {
   return { summary: normalized, readWhen };
 }
 
-console.log('Listing all markdown files in docs folder:');
+console.log(`Listing all markdown files in docs folder: ${DOCS_DIR}`);
 
 const markdownFiles = walkMarkdownFiles(DOCS_DIR);
 
