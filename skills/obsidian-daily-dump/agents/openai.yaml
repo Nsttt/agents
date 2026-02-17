@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian Daily Dump"
+  short_description: "Create session notes linked to today's Obsidian daily note"
+  default_prompt: "Create a new Obsidian session note with current outcomes and link it back to today's daily note."
